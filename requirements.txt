@@ -18,3 +18,4 @@ scikit-learn
 langchain_experimental
 langchain-community
 langgraph
+pydantic

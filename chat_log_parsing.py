@@ -1,5 +1,5 @@
 import re
-from collections import Counter
+from sklearn.feature_extraction.text import TfidfVectorizer
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -28,13 +28,25 @@ class ChatAnalyzer:
         total = len(self.user_msgs) + len(self.ai_msgs)
         return total, len(self.user_msgs), len(self.ai_msgs)
 
-    def extract_keywords(self, top_n=5):
-        all_text = ' '.join(self.user_msgs + self.ai_msgs).lower()
-        tokens = word_tokenize(all_text)
-        stop_words = set(stopwords.words('english'))
-        filtered_tokens = [w for w in tokens if w.isalnum() and w not in stop_words]
-        freq_dist = Counter(filtered_tokens)
-        return freq_dist.most_common(top_n)
+    def extract_keywords(self, top_n=10):
+        documents = [' '.join(self.user_msgs + self.ai_msgs)]
+
+        stop_words = list(stopwords.words('english'))  
+
+        vectorizer = TfidfVectorizer(
+            stop_words=stop_words,
+            lowercase=True,
+            token_pattern=r'\b[a-zA-Z]{2,}\b'
+        )
+
+        tfidf_matrix = vectorizer.fit_transform(documents)
+        feature_names = vectorizer.get_feature_names_out()
+        scores = tfidf_matrix.toarray()[0]
+
+        tfidf_scores = list(zip(feature_names, scores))
+        sorted_keywords = sorted(tfidf_scores, key=lambda x: x[1], reverse=True)
+
+        return sorted_keywords[:top_n]
 
     def analyze(self):
         lines = self.read_chat_log()
