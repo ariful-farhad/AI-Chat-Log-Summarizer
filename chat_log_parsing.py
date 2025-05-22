@@ -1,5 +1,4 @@
 import re
-import sys
 from collections import Counter
 import nltk
 from nltk.corpus import stopwords
@@ -8,45 +7,40 @@ from nltk.tokenize import word_tokenize
 nltk.download('punkt')
 nltk.download('stopwords')
 
-def read_chat_log(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return file.readlines()
-      
-def parse_chat(lines):
-    user_msgs, ai_msgs = [], []
-    for line in lines:
-        line = line.strip()
-        if line.startswith("User:"):
-            user_msgs.append(line[5:].strip())
-        elif line.startswith("AI:"):
-            ai_msgs.append(line[3:].strip())
-    return user_msgs, ai_msgs
+class ChatAnalyzer:
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+        self.user_msgs = []
+        self.ai_msgs = []
 
-def count_messages(user_msgs, ai_msgs):
-    return len(user_msgs) + len(ai_msgs), len(user_msgs), len(ai_msgs)
+    def read_chat_log(self):
+        with open(self.file_path, 'r', encoding='utf-8') as file:
+            return file.readlines()
 
-def extract_keywords(messages, top_n=5):
-    all_text = ' '.join(messages).lower()
-    tokens = word_tokenize(all_text)
-    stop_words = set(stopwords.words('english'))
-    filtered_tokens = [w for w in tokens if w.isalnum() and w not in stop_words]
-    freq_dist = Counter(filtered_tokens)
-    return freq_dist.most_common(top_n)
+    def parse_chat(self, lines):
+        for line in lines:
+            line = line.strip()
+            if line.startswith("User:"):
+                self.user_msgs.append(line[5:].strip())
+            elif line.startswith("AI:"):
+                self.ai_msgs.append(line[3:].strip())
 
-def generate_summary(total, user_count, ai_count, keywords):
-    print("\nSummary:")
-    print(f"- Total number of exchanges: {total}")
-    print(f"- User messages: {user_count}, AI messages: {ai_count}")
-    print("- Most common keywords:", ', '.join(word for word, _ in keywords))
-   
+    def count_messages(self):
+        total = len(self.user_msgs) + len(self.ai_msgs)
+        return total, len(self.user_msgs), len(self.ai_msgs)
 
-def main():
-    file_path = "chat.txt"
-    lines = read_chat_log(file_path)
-    user_msgs, ai_msgs = parse_chat(lines)
-    total, user_count, ai_count = count_messages(user_msgs, ai_msgs)
-    keywords = extract_keywords(user_msgs + ai_msgs)
-    generate_summary(total, user_count, ai_count, keywords)
+    def extract_keywords(self, top_n=5):
+        all_text = ' '.join(self.user_msgs + self.ai_msgs).lower()
+        tokens = word_tokenize(all_text)
+        stop_words = set(stopwords.words('english'))
+        filtered_tokens = [w for w in tokens if w.isalnum() and w not in stop_words]
+        freq_dist = Counter(filtered_tokens)
+        return freq_dist.most_common(top_n)
 
-if __name__ == "__main__":
-    main()
+    def analyze(self):
+        lines = self.read_chat_log()
+        self.parse_chat(lines)
+        return self.count_messages(), self.extract_keywords()
+
+    def get_full_text(self):
+        return '\n'.join(self.read_chat_log())
