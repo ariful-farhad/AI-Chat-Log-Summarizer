@@ -1,71 +1,99 @@
 # AI Chat Log Summarizer
 
-This project summarizes chat logs using the Gemini language model. It can generate individual summaries for specific chat files or a combined summary of all chat files in the "chats" directory.
+## Overview
 
-## Requirements
+This project is a Python-based tool designed to analyze and summarize AI chat conversations. It processes plain-text `.txt` chat logs and performs the following tasks:
 
-- Python 3.6+
-- The following Python packages:
+- Separates user and AI messages
+- Counts messages from both sides
+- Extracts top keywords using TF-IDF
+- Generates concise summaries using Google's Gemini model
+- Saves structured outputs in JSON and text formats
 
-  ```
-  nltk==3.8.1
-  langchain
-  langchain-core
-  langchain-google-genai
-  google-generativeai
-  python-dotenv
-  numpy
-  scikit-learn
-  langchain_experimental
-  langchain-community
-  langgraph
-  pydantic
-  ```
+## Features
 
-  You can install these packages using pip:
+- Individual and combined summary generation
+- Keyword extraction and frequency analysis
+- Organized output directory for reports
 
-  ```bash
-  pip install -r requirements.txt
-  ```
-
-  Additionally, the project requires downloading `punkt` and `stopwords` from `nltk`. This is done by running the `setup.py` file:
-
-  ```bash
-  python setup.py
-  ```
-
-## Usage
-
-1.  Clone the repository.
-2.  Install the required packages using `pip install -r requirements.txt`.
-3.  Run `python setup.py` to download the necessary `nltk` data.
-4.  Create a `.env` file with your Gemini API key:
-
-    ```
-    GEMINI_API_KEY=YOUR_API_KEY
-    ```
-
-5.  Place your chat log files (in `.txt` format) in the `chats` directory.
-6.  Run `main.py`.
-7.  Select an option:
-    - 1: Generate individual chat summary
-    - 2: Generate combined summary of all chats
-8.  The output summaries will be saved in the `outputs` directory.
-
-## Example
-
-Here's an example of how to run the project and generate a combined summary of all chat files:
-
-1.  Open a terminal and navigate to the project directory.
-2.  Run `python setup.py`.
-3.  Run `python main.py`.
-4.  Enter `2` to select the "Generate combined summary of all chats" option.
-5.  The final summary will be saved in the `outputs/final_summary.txt` file.
-
-## Sample Output
+## Folder Structure
 
 ```
-Combined Summary:
-- The conversation discusses various topics, including project updates, technical issues, and potential solutions. The team members collaborate to troubleshoot problems and make progress on the project.
-- Most common keywords: project, update, issue, solution, team.
+.
+├── chats/                # Input chat files (chat1.txt, chat2.txt, ...)
+├── outputs/              # Output folder for summaries and JSON files
+├── chat_log_parsing.py   # Module for parsing and analyzing chat logs
+├── chat_summary.py       # Module for generating summaries using Gemini
+├── main.py               # Entry point script
+├── .env                  # Stores API key
+├── requirements.txt      # Python dependencies
+└── README.md             # Documentation
+```
+
+## Input Format
+
+Chat logs must follow this format:
+
+```
+User: Hello, what is Python?
+AI: Python is a programming language.
+User: What can I build with it?
+AI: You can build websites, data apps, AI systems, and more.
+```
+
+## Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/chat-log-summarizer.git
+cd chat-log-summarizer
+```
+
+### 2. Set Up the Environment
+
+Ensure Python 3.10 or higher is installed.
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Configure API Key
+
+Create a `.env` file and add your Gemini API key:
+
+```
+GOOGLE_API_KEY=your_gemini_api_key_here
+```
+
+### 4. Add Chat Files
+
+Place your `.txt` chat logs inside the `chats/` folder.
+
+### 5. Run the Tool
+
+```bash
+python main.py
+```
+
+Choose from:
+
+- **Individual Report**: Select a file to generate and view detailed summary
+- **Combined Report**: Generate a single summary for all chats
+
+## Output
+
+- `outputs/<chat_name>.json`: Ordered user/AI messages
+- `outputs/<chat_name>_summary.txt`: Summary report for the chat
+- `outputs/final_summary.txt`: Combined summary of all chats
+
+## Example Output
+
+```
+Summary:
+- The conversation had 15 exchanges.
+- The user asked mainly about Python and its uses.
+- Most common keywords: Python, use, data, AI, language.
 ```
